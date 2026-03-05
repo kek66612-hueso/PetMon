@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "233918645047",
+    "project_id": "petmon-b43d5",
+    "storage_bucket": "petmon-b43d5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233918645047:android:cf7014d057736011f850b2",
+        "android_client_info": {
+          "package_name": "com.pozornik.mypetmon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWfgxExJdQPa9f7GjPZ2x6ZY_n5zR2brw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233918645047:android:851643893e9939b1f850b2",
+        "android_client_info": {
+          "package_name": "my.petmon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWfgxExJdQPa9f7GjPZ2x6ZY_n5zR2brw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

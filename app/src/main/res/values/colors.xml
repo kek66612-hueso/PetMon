@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="light_gray">#9E9E9E</color>
+
+    <!-- Цвета для шапки и фона -->
+    <color name="telegram_blue">#517DA2</color>
+
+    <!-- День -->
+    <color name="day_avatar_circle">#4FC3F7</color> <!-- Голубой -->
+
+    <!-- Ночь -->
+    <color name="night_background">#333333</color> <!-- Серый -->
+    <color name="night_avatar_circle">#1A237E</color> <!-- Темно-синий -->
+</resources>

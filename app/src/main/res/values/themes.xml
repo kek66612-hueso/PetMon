@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.MyPetMon" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#517DA2</item>
+    </style>
+    <style name="Theme.MyPetMon.Light" parent="Base.Theme.MyPetMon" />
+    <style name="CircleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>
