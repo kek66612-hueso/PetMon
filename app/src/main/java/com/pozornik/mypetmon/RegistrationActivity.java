@@ -9,6 +9,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
+import android.view.Window;
+import android.view.WindowManager;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 public class RegistrationActivity extends AppCompatActivity {
 

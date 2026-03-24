@@ -23,6 +23,7 @@
         <activity android:name=".RegistrationActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".ProfileActivity" />
+        <activity android:name=".AnimationsActivity" />
 
     </application>
 </manifest>
