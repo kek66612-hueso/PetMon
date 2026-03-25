@@ -4,14 +4,11 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 
 public class SwipeHelper extends GestureDetector.SimpleOnGestureListener {
-<<<<<<< Updated upstream
-    private static final int SWIPE_THRESHOLD = 100;
-    private static final int SWIPE_VELOCITY_THRESHOLD = 100;
-=======
+
     // БЫЛО 100, СТАЛО 30. Теперь реагирует на легчайшее касание.
     private static final int SWIPE_THRESHOLD = 30;
     private static final int SWIPE_VELOCITY_THRESHOLD = 30;
->>>>>>> Stashed changes
+
 
     public interface SwipeListener {
         void onSwipeLeft();  // Палец влево (переход на экран справа)

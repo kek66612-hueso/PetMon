@@ -13,78 +13,69 @@
         android:layout_height="?attr/actionBarSize"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="Ваш профиль"
+        android:text="Профиль"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#9E9E9E" />
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardProfile"
+        <TextView
+            android:id="@+id/tvProfileAvatar"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:background="@drawable/bg_circle"
+            android:gravity="center"
+            android:text="🐶"
+            android:textSize="70sp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/tvProfileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User Name"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#9E9E9E"
+            android:layout_marginBottom="40dp"/>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp">
+            android:orientation="horizontal"
+            android:weightSum="2">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/btnEditProfile"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Изменить ️"
+                android:backgroundTint="#E0E0E0"
+                android:textColor="#333333"
+                android:textSize="13sp"
+                app:cornerRadius="16dp"/>
 
-                <TextView
-                    android:id="@+id/tvAvatarPreview"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:background="@drawable/bg_circle"
-                    android:gravity="center"
-                    android:text="🐶"
-                    android:textSize="60sp"
-                    android:layout_marginBottom="16dp"/>
+            <Button
+                android:id="@+id/btnGoToSettings"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Настройки ️"
+                android:backgroundTint="#2D3436"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                app:cornerRadius="16dp"/>
 
-                <Button
-                    android:id="@+id/btnChangePhoto"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Сменить аватара"
-                    android:backgroundTint="#E0E0E0"
-                    android:textColor="#333333"
-                    app:cornerRadius="12dp"
-                    android:layout_marginBottom="24dp"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:counterEnabled="true"
-                    app:counterMaxLength="15"
-                    app:counterTextColor="@color/light_gray">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etUserName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Ваше имя"
-                        android:textColor="#9E9E9E"
-                        android:maxLength="15"
-                        android:inputType="textPersonName"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <Button
-                    android:id="@+id/btnSaveProfile"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="24dp"
-                    android:text="Сохранить"
-                    android:backgroundTint="#2D3436"
-                    android:textColor="#FFFFFF"
-                    app:cornerRadius="12dp"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </ScrollView>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

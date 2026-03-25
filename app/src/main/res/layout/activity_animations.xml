@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-<<<<<<< Updated upstream
-=======
     xmlns:app="http://schemas.android.com/apk/res-auto"
->>>>>>> Stashed changes
     android:id="@+id/animations_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,10 +13,6 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
         app:title="Анимации"
-<<<<<<< Updated upstream
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-=======
->>>>>>> Stashed changes
         app:titleTextColor="#9E9E9E" />
 
     <ScrollView
@@ -27,19 +20,6 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
-<<<<<<< Updated upstream
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardSplashAnim"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#FFFFFF">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardTransitionAnim"
-=======
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,62 +27,11 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardSplashAnim"
->>>>>>> Stashed changes
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="#FFFFFF"
-<<<<<<< Updated upstream
-                android:layout_marginTop="16dp">
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchTransitions"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Анимации переходов"
-                    android:textColor="#9E9E9E"
-                    android:textSize="16sp"
-                    android:padding="20dp"/>
-            </androidx.cardview.widget.CardView>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/tvSplashAnimTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Анимация при запуске"
-                    android:textSize="18sp"
-                    android:textColor="#9E9E9E"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="16dp"/>
-
-                <SeekBar
-                    android:id="@+id/seekBarSplash"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="2"
-                    android:progress="2"
-                    style="@style/Widget.AppCompat.SeekBar.Discrete" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:paddingHorizontal="12dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Откл" android:textColor="#9E9E9E" android:layout_alignParentStart="true"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Статичная" android:textColor="#9E9E9E" android:layout_centerInParent="true"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Вкл" android:textColor="#9E9E9E" android:layout_alignParentEnd="true"/>
-                </RelativeLayout>
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-=======
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout
@@ -160,11 +89,9 @@
                             android:textSize="12sp"
                             android:layout_alignParentEnd="true"/>
                     </RelativeLayout>
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
->>>>>>> Stashed changes
     </ScrollView>
 </LinearLayout>

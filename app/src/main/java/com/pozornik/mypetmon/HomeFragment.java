@@ -30,9 +30,11 @@ public class HomeFragment extends Fragment {
         tvHealthText = view.findViewById(R.id.tvHealthText);
         tvActivityText = view.findViewById(R.id.tvActivityText);
 
+
         // Наш новый большой эмодзи
         tvMainPetEmoji = view.findViewById(R.id.tvMainPetEmoji);
         return view;
+
     }
 
     @Override
@@ -64,6 +66,10 @@ public class HomeFragment extends Fragment {
             cardStatus.setCardBackgroundColor(Color.WHITE);
             cardHealth.setCardBackgroundColor(Color.WHITE);
             cardActivity.setCardBackgroundColor(Color.WHITE);
+
+
         }
+
     }
+
 }
