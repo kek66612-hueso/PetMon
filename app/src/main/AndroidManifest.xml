@@ -25,6 +25,7 @@
         <activity android:name=".SettingsActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".AnimationsActivity" />
+        <activity android:name=".LoginActivity" />
 
 
         <receiver android:name=".CancelDeletionReceiver" android:exported="false" />

@@ -188,11 +188,11 @@ public class SettingsActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         WindowInsetsControllerCompat insets = new WindowInsetsControllerCompat(window, window.getDecorView());
 
-<<<<<<< Updated upstream
+
         // Красим кастомный ползунок (Черный на светлом, Белый на темном)
-=======
+
 // Красим кастомный ползунок (Черный на светлом, Белый на темном)
->>>>>>> Stashed changes
+
         int thumbColor = theme.equals("night") ? Color.WHITE : Color.BLACK;
         int trackColor = theme.equals("night") ? Color.parseColor("#555555") : Color.parseColor("#CCCCCC");
         ColorStateList thumbStates = new ColorStateList(
