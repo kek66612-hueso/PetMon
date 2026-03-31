@@ -3,6 +3,8 @@
     package="com.pozornik.mypetmon">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
 
     <application
         android:allowBackup="true"
@@ -23,6 +25,12 @@
         <activity android:name=".RegistrationActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".ProfileActivity" />
+        <activity android:name=".AnimationsActivity" />
+        <activity android:name=".LoginActivity" />
 
+
+
+        <receiver android:name=".CancelDeletionReceiver" android:exported="false" />
     </application>
+
 </manifest>

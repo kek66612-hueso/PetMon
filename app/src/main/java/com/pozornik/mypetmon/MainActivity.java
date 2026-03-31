@@ -1,130 +1,90 @@
 package com.pozornik.mypetmon;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "AppConfig";
     private static final String KEY_THEME = "theme_mode";
-    private static final String KEY_USER_NAME = "user_name";
 
-    private View rootLayout;
-    private TextView tvGreeting;
+    private ViewPager2 viewPager;
     private BottomNavigationView bottomNav;
-
-    private CardView cardStatus, cardHealth, cardActivity;
-    private TextView tvStatusTitle, tvHealthText, tvActivityText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        if (!prefs.getBoolean("is_registered", false)) {
-            startActivity(new Intent(this, RegistrationActivity.class));
-            finish();
-            return;
-        }
-
         setContentView(R.layout.activity_main);
 
-        rootLayout = findViewById(R.id.main_root);
-        tvGreeting = findViewById(R.id.tvGreeting);
+        viewPager = findViewById(R.id.viewPager);
         bottomNav = findViewById(R.id.bottom_navigation);
 
-        cardStatus = findViewById(R.id.cardStatus);
-        cardHealth = findViewById(R.id.cardHealth);
-        cardActivity = findViewById(R.id.cardActivity);
+        // Настраиваем карусель
+        MainPagerAdapter adapter = new MainPagerAdapter(this);
+        viewPager.setAdapter(adapter);
 
-        tvStatusTitle = findViewById(R.id.tvStatusTitle);
-        tvHealthText = findViewById(R.id.tvHealthText);
-        tvActivityText = findViewById(R.id.tvActivityText);
+        // Отключаем лишнюю чувствительность свайпа, чтобы было плавно
+        viewPager.setOffscreenPageLimit(3);
 
-        getAndLogFirebaseToken();
-        updateUI();
+        // Стартуем с Главного экрана (индекс 1)
+        viewPager.setCurrentItem(1, false);
+        bottomNav.setSelectedItemId(R.id.nav_home);
 
+        // Связываем свайпы пальцем с выделением кнопок в нижнем меню
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0: bottomNav.getMenu().findItem(R.id.nav_settings).setChecked(true); break;
+                    case 1: bottomNav.getMenu().findItem(R.id.nav_home).setChecked(true); break;
+                    case 2: bottomNav.getMenu().findItem(R.id.nav_profile).setChecked(true); break;
+                }
+            }
+        });
+
+        // Связываем клики по нижнему меню с пролистыванием карусели
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            boolean useSwipe = prefs.getBoolean("enable_swipe", true);
 
-            if (id == R.id.nav_home) {
-                return true;
-            }
-            else if (id == R.id.nav_settings) {
-                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-                // МГНОВЕННЫЙ ПЕРЕХОД: отключаем анимацию
-                overridePendingTransition(0, 0);
-                return true;
-            }
-            else if (id == R.id.nav_profile) {
-                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-                // МГНОВЕННЫЙ ПЕРЕХОД: отключаем анимацию
-                overridePendingTransition(0, 0);
-                return true;
-            }
-            return false;
+            if (id == R.id.nav_settings) viewPager.setCurrentItem(0, useSwipe);
+            else if (id == R.id.nav_home) viewPager.setCurrentItem(1, useSwipe);
+            else if (id == R.id.nav_profile) viewPager.setCurrentItem(2, useSwipe);
+            return true;
         });
+
+        applyTheme();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateUI();
-
-        if (bottomNav != null) {
-            bottomNav.setSelectedItemId(R.id.nav_home);
-        }
-    }
-
-    private void getAndLogFirebaseToken() {
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.w("FCM", "Не удалось получить токен", task.getException());
-                        return;
-                    }
-                    String token = task.getResult();
-                    Log.d("FCM_TOKEN", token);
-                    System.out.println("TOKEN: " + token);
-                });
-    }
-
-    private void updateUI() {
+    // Метод перекраски шторки и фона (вызывается в том числе из фрагментов при смене темы)
+    public void applyTheme() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        String name = prefs.getString(KEY_USER_NAME, "User");
-        tvGreeting.setText("Привет, " + name + " 👋");
-
-        // === ВЕСЬ ТЕКСТ СВЕТЛО-СЕРЫЙ ===
-        int lightGray = Color.parseColor("#9E9E9E");
-        tvGreeting.setTextColor(lightGray);
-        tvStatusTitle.setTextColor(lightGray);
-        tvHealthText.setTextColor(lightGray);
-        tvActivityText.setTextColor(lightGray);
-
         String theme = prefs.getString(KEY_THEME, "day");
+
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        WindowInsetsControllerCompat insets = new WindowInsetsControllerCompat(window, window.getDecorView());
+
         if (theme.equals("night")) {
-            rootLayout.setBackgroundColor(Color.parseColor("#121212"));
+            findViewById(R.id.main_root).setBackgroundColor(Color.parseColor("#121212"));
             bottomNav.setBackgroundColor(Color.parseColor("#121212"));
-            cardStatus.setCardBackgroundColor(Color.parseColor("#1E1E1E"));
-            cardHealth.setCardBackgroundColor(Color.parseColor("#1E1E1E"));
-            cardActivity.setCardBackgroundColor(Color.parseColor("#1E1E1E"));
+            window.setStatusBarColor(Color.parseColor("#121212"));
+            insets.setAppearanceLightStatusBars(false);
         } else {
-            rootLayout.setBackgroundColor(Color.parseColor("#F4F7F6"));
+            findViewById(R.id.main_root).setBackgroundColor(Color.parseColor("#F4F7F6"));
             bottomNav.setBackgroundColor(Color.WHITE);
-            cardStatus.setCardBackgroundColor(Color.WHITE);
-            cardHealth.setCardBackgroundColor(Color.WHITE);
-            cardActivity.setCardBackgroundColor(Color.WHITE);
+            window.setStatusBarColor(Color.parseColor("#F4F7F6"));
+            insets.setAppearanceLightStatusBars(true);
         }
     }
 }
