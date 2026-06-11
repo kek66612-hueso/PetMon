@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileFragment extends Fragment {
 
@@ -59,17 +60,16 @@ public class ProfileFragment extends Fragment {
                 if (bottomNav != null) {
                     bottomNav.setSelectedItemId(R.id.nav_settings);
                 }
-// ЗАПРОС РАЗРЕШЕНИЯ НА УВЕДОМЛЕНИЯ (ДЛЯ ANDROID 13+)
+                // ЗАПРОС РАЗРЕШЕНИЯ НА УВЕДОМЛЕНИЯ (ДЛЯ ANDROID 13+)
                 if (Build.VERSION.SDK_INT >= 33) {
                     if (ContextCompat.checkSelfPermission(requireContext(), "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(requireActivity(), new String[]{"android.permission.POST_NOTIFICATIONS"}, 101);
                     }
                 }
-
             }
         });
 
-// Загружаем тему и профиль до того, как экран покажется пользователю
+        // Загружаем тему и профиль до того, как экран покажется пользователю
         applyCurrentTheme();
         loadProfileData();
 
@@ -99,6 +99,7 @@ public class ProfileFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE);
         tempEmoji = prefs.getString("user_avatar_emoji", "🐶");
         String currentName = prefs.getString("user_name", "");
+        String currentLogin = prefs.getString("user_login", ""); // Нужен для Firebase!
 
         // Надуваем дизайн нашего окна
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_profile, null);
@@ -112,7 +113,7 @@ public class ProfileFragment extends Fragment {
         tvDialogAvatar.setText(tempEmoji);
         etDialogName.setText(currentName);
 
-        // Создаем само окно с прозрачным фоном (чтобы работали скругленные края из XML)
+        // Создаем само окно с прозрачным фоном
         AlertDialog dialog = new AlertDialog.Builder(getActivity())
                 .setView(dialogView)
                 .create();
@@ -124,32 +125,43 @@ public class ProfileFragment extends Fragment {
         // Клик по аватарке внутри окна открывает выбор эмодзи
         avatarContainer.setOnClickListener(v -> {
             new AlertDialog.Builder(getActivity())
-                    .setTitle("Выберите аватара")
+                    .setTitle("Выберите питомца")
                     .setItems(emojis, (d, which) -> {
                         tempEmoji = emojis[which];
                         tvDialogAvatar.setText(tempEmoji);
                     }).show();
         });
 
-        // Клик по кнопке "Сохранить" внутри окна
+        // --- МАГИЯ FIREBASE ВНУТРИ ТВОЕЙ КНОПКИ ---
         btnDialogSave.setOnClickListener(v -> {
             String newName = etDialogName.getText() != null ? etDialogName.getText().toString().trim() : "";
             if (newName.length() < 2) {
                 Toast.makeText(getActivity(), "Имя должно содержать хотя бы 2 символа", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (currentLogin.isEmpty()) {
+                Toast.makeText(getActivity(), "Ошибка: Логин не найден", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            // Сохраняем новые данные
+            // 1. Сразу сохраняем локально для мгновенного обновления интерфейса (Оффлайн-first)
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("user_name", newName);
             editor.putString("user_avatar_emoji", tempEmoji);
             editor.apply();
 
-            Toast.makeText(getActivity(), "Профиль обновлен!", Toast.LENGTH_SHORT).show();
-
             // Обновляем визитку на экране и закрываем окно
             loadProfileData();
             dialog.dismiss();
+            Toast.makeText(getActivity(), "Сохранено! Синхронизация в фоне ☁️", Toast.LENGTH_SHORT).show();
+
+            // 2. Отправляем в Firebase (если нет сети, Firestore сам поставит это в очередь и отправит при появлении сети)
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("Users").document(currentLogin)
+                    .set(new java.util.HashMap<String, Object>() {{
+                        put("name", newName);
+                        put("avatar", tempEmoji);
+                    }}, com.google.firebase.firestore.SetOptions.merge());
         });
 
         dialog.show();

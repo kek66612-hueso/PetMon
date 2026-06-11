@@ -58,8 +58,8 @@
                 android:layout_height="55dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="Изменить ️"
-                android:backgroundTint="#E0E0E0"
+                android:text="Изменить ✏️"
+                app:backgroundTint="#E0E0E0"
                 android:textColor="#333333"
                 android:textSize="13sp"
                 app:cornerRadius="16dp"/>
@@ -70,8 +70,8 @@
                 android:layout_height="55dp"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:text="Настройки ️"
-                android:backgroundTint="#2D3436"
+                android:text="Настройки ⚙️"
+                app:backgroundTint="#2D3436"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 app:cornerRadius="16dp"/>

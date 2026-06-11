@@ -8,18 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,15 +33,15 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class SettingsFragment extends Fragment {
 
-    private CardView cardTheme, cardAnim, cardDangerZone;
-    private TextView tvThemeDesc, tvAnimDesc, tvSettingsAvatar, tvSettingsName;
-    private EditText etSearch;
+    private View settingsRootLayout;
+    private TextView tvSettingsTitle, tvSettingsName, tvSettingsAvatar;
+    private ImageButton btnSearchSettings;
     private LinearLayout profileHeader;
 
-    // Кнопки опасной зоны
-    private Button btnDeleteAccount, btnCancelDeletion, btnLogout;
+    private CardView cardGeneralSettings, cardAppSettings, cardDangerZone;
+    private TextView menuPetInfo, menuAppearance, menuNotifications, menuLogout, menuDeleteData;
 
-    // Слушатель для синхронизации со шторкой
+    // Слушатель для синхронизации со шторкой (из твоего старого кода)
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
     @Nullable
@@ -54,136 +49,117 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        cardTheme = view.findViewById(R.id.cardTheme);
-        cardAnim = view.findViewById(R.id.cardAnim);
-        cardDangerZone = view.findViewById(R.id.cardDangerZone);
-        tvThemeDesc = view.findViewById(R.id.tvThemeDesc);
-        tvAnimDesc = view.findViewById(R.id.tvAnimDesc);
-        etSearch = view.findViewById(R.id.etSearch);
-        profileHeader = view.findViewById(R.id.profileHeader);
-        tvSettingsAvatar = view.findViewById(R.id.tvSettingsAvatar);
+        // Инициализация View
+        settingsRootLayout = view.findViewById(R.id.settingsRootLayout);
+        tvSettingsTitle = view.findViewById(R.id.tvSettingsTitle);
         tvSettingsName = view.findViewById(R.id.tvSettingsName);
-        ImageView btnSearch = view.findViewById(R.id.btnSearch);
+        tvSettingsAvatar = view.findViewById(R.id.tvSettingsAvatar);
+        profileHeader = view.findViewById(R.id.profileHeader);
+        btnSearchSettings = view.findViewById(R.id.btnSearchSettings);
 
-        btnLogout = view.findViewById(R.id.btnLogout);
-        btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
-        btnCancelDeletion = view.findViewById(R.id.btnCancelDeletion);
+        cardGeneralSettings = view.findViewById(R.id.cardGeneralSettings);
+        cardAppSettings = view.findViewById(R.id.cardAppSettings);
+        cardDangerZone = view.findViewById(R.id.cardDangerZone);
 
-        // ЗАПРОС РАЗРЕШЕНИЯ НА УВЕДОМЛЕНИЯ (ДЛЯ ANDROID 13+)
+        menuPetInfo = view.findViewById(R.id.menuPetInfo);
+        menuAppearance = view.findViewById(R.id.menuAppearance);
+        menuNotifications = view.findViewById(R.id.menuNotifications);
+        menuLogout = view.findViewById(R.id.menuLogout);
+        menuDeleteData = view.findViewById(R.id.menuDeleteData);
+
+        // ЗАПРОС РАЗРЕШЕНИЯ НА УВЕДОМЛЕНИЯ (Твой код для Android 13+)
         if (Build.VERSION.SDK_INT >= 33) {
             if (ContextCompat.checkSelfPermission(requireContext(), "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(requireActivity(), new String[]{"android.permission.POST_NOTIFICATIONS"}, 101);
             }
         }
 
-        // Проверка таймера при открытии
+        // Загрузка данных владельца и покраска
+        loadOwnerData();
+        applyTheme();
+
+        // Проверка таймера при открытии (Твоя логика)
         checkDeletionStatus();
 
-        btnLogout.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Toast.makeText(getActivity(), "Вы вышли из аккаунта", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getActivity(), RegistrationActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        });
-
-        btnDeleteAccount.setOnClickListener(v -> showDeleteConfirmationDialog());
-
-        btnCancelDeletion.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE).edit().remove("account_delete_time").apply();
-
-                NotificationManager nm = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-                if (nm != null) nm.cancel(1001);
-
-                Toast.makeText(getActivity(), "Удаление отменено", Toast.LENGTH_SHORT).show();
-                checkDeletionStatus();
-            }
-        });
-
-        // Интерфейс: кнопки темы и переходы
-        view.findViewById(R.id.btnDay).setOnClickListener(v -> changeTheme("day"));
-        view.findViewById(R.id.btnNight).setOnClickListener(v -> changeTheme("night"));
-        cardAnim.setOnClickListener(v -> startActivity(new Intent(getActivity(), AnimationsActivity.class)));
-
-        // Поиск
-        btnSearch.setOnClickListener(v -> {
-            if (etSearch.getVisibility() == View.GONE) {
-                etSearch.setVisibility(View.VISIBLE);
-                profileHeader.setVisibility(View.GONE);
-                etSearch.requestFocus();
-            } else {
-                etSearch.setVisibility(View.GONE);
-                profileHeader.setVisibility(View.VISIBLE);
-                etSearch.setText("");
-            }
-        });
-
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String query = s.toString().toLowerCase().trim();
-                if (query.isEmpty()) {
-                    cardTheme.setVisibility(View.VISIBLE);
-                    cardAnim.setVisibility(View.VISIBLE);
-                    return;
-                }
-                cardTheme.setVisibility("тема внешний вид день ночь".contains(query) ? View.VISIBLE : View.GONE);
-                cardAnim.setVisibility("анимация анимации запуск эффекты".contains(query) ? View.VISIBLE : View.GONE);
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-
-        // --- СИНХРОНИЗАЦИЯ СО ШТОРКОЙ В РЕАЛЬНОМ ВРЕМЕНИ ---
+        // --- СИНХРОНИЗАЦИЯ СО ШТОРКОЙ (Твоя логика) ---
         if (getActivity() != null) {
             SharedPreferences prefs = getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE);
             prefListener = (sharedPreferences, key) -> {
                 if ("account_delete_time".equals(key)) {
-                    // Если нажали в шторке "Я передумал", кнопки мгновенно обновятся
+
                     checkDeletionStatus();
                 }
             };
             prefs.registerOnSharedPreferenceChangeListener(prefListener);
         }
 
-        applyCurrentTheme();
+        // --- НАВИГАЦИЯ И КЛИКИ ---
 
-        if (getActivity() != null) {
-            SharedPreferences prefs = getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE);
-            tvSettingsAvatar.setText(prefs.getString("user_avatar_emoji", "🐶"));
-            tvSettingsName.setText(prefs.getString("user_name", "User"));
-        }
+        btnSearchSettings.setOnClickListener(v -> {
+            // Оставил заглушкой пока не сделаем отдельный UI для поиска в новом дизайне
+            Toast.makeText(getContext(), "Поиск скоро вернется...", Toast.LENGTH_SHORT).show();
+        });
+
+        menuAppearance.setOnClickListener(v -> {
+            // Переход на наш новый экран с тумблером поверх всего приложения
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_root, new AppearanceFragment()) // <-- ТВОЙ НАСТОЯЩИЙ ID
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        // Заглушки для экранов, которых пока физически не существует
+        menuPetInfo.setOnClickListener(v -> Toast.makeText(getContext(), "Открываем данные питомца...", Toast.LENGTH_SHORT).show());
+        menuNotifications.setOnClickListener(v -> Toast.makeText(getContext(), "Открываем настройки уведомлений...", Toast.LENGTH_SHORT).show());
+
+        // --- ТВОЯ ЛОГИКА ОПАСНОЙ ЗОНЫ ---
+
+        menuLogout.setOnClickListener(v -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Выход из аккаунта")
+                    .setMessage("Вы уверены, что хотите выйти?")
+                    .setPositiveButton("Выйти", (dialog, which) -> {
+                        FirebaseAuth.getInstance().signOut();
+                        Toast.makeText(getActivity(), "Вы вышли из аккаунта", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getActivity(), RegistrationActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Отмена", null)
+                    .show();
+        });
+
+        menuDeleteData.setOnClickListener(v -> {
+            SharedPreferences prefs = requireActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE);
+            long deleteTime = prefs.getLong("account_delete_time", 0);
+
+            if (deleteTime > 0) {
+                // Если таймер уже запущен, даем возможность отменить прямо отсюда
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Отмена удаления")
+                        .setMessage("Процесс удаления уже запущен. Хотите отменить его?")
+                        .setPositiveButton("Отменить удаление", (dialog, which) -> {
+                            prefs.edit().remove("account_delete_time").apply();
+                            NotificationManager nm = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                            if (nm != null) nm.cancel(1001);
+                            Toast.makeText(getActivity(), "Удаление отменено", Toast.LENGTH_SHORT).show();
+                            checkDeletionStatus();
+                        })
+                        .setNegativeButton("Закрыть", null)
+                        .show();
+            } else {
+                showDeleteConfirmationDialog();
+            }
+        });
 
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Мелкие обновления при возврате на экран (но без полной перекраски)
-        checkDeletionStatus();
-
-        if (getActivity() != null) {
-            SharedPreferences prefs = getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE);
-            tvSettingsAvatar.setText(prefs.getString("user_avatar_emoji", "🐶"));
-            tvSettingsName.setText(prefs.getString("user_name", "User"));
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Отключаем слушателя шторки при закрытии окна, чтобы не забивать память (очень важно!)
-        if (getActivity() != null && prefListener != null) {
-            getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
-                    .unregisterOnSharedPreferenceChangeListener(prefListener);
-        }
-    }
-
-    // --- МЕТОДЫ ОПАСНОЙ ЗОНЫ ---
+    // --- МЕТОДЫ ОПАСНОЙ ЗОНЫ (ТВОЙ ПОЛНОЦЕННЫЙ КОД) ---
 
     private long getDeletionDelayMs() {
-        return 60 * 1000; // 1 минута (заменишь потом на 7 дней)
+        return 60 * 1000; // 1 минута
     }
 
     private void checkDeletionStatus() {
@@ -191,6 +167,7 @@ public class SettingsFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE);
         long deleteTime = prefs.getLong("account_delete_time", 0);
 
+        String theme = prefs.getString("theme_mode", "day");
         if (deleteTime > 0) {
             if (System.currentTimeMillis() >= deleteTime) {
                 // ВРЕМЯ ПРИШЛО: РЕАЛЬНОЕ УДАЛЕНИЕ ИЗ FIREBASE
@@ -214,12 +191,14 @@ public class SettingsFragment extends Fragment {
                     });
                 }
             } else {
-                btnDeleteAccount.setVisibility(View.GONE);
-                btnCancelDeletion.setVisibility(View.VISIBLE);
+                // Таймер запущен - меняем текст кнопки
+                menuDeleteData.setText("⏱ Отменить удаление аккаунта");
+                menuDeleteData.setTextColor(theme.equals("night") ? Color.parseColor("#E0E0E0") : Color.parseColor("#FF9800"));
             }
         } else {
-            btnDeleteAccount.setVisibility(View.VISIBLE);
-            btnCancelDeletion.setVisibility(View.GONE);
+            // Обычное состояние
+            menuDeleteData.setText("Удалить все данные питомца");
+            menuDeleteData.setTextColor(theme.equals("night") ? Color.parseColor("#E0E0E0") : Color.parseColor("#D32F2F"));
         }
     }
 
@@ -228,7 +207,7 @@ public class SettingsFragment extends Fragment {
 
         new AlertDialog.Builder(getActivity())
                 .setTitle("Удаление аккаунта")
-                .setMessage("Аккаунт будет удален через выбранное время. Если вы передумали, нажмите «Я передумал» в уведомлении или «Отменить удаление» в настройках.")
+                .setMessage("Аккаунт будет удален через 1 минуту. Если вы передумали, нажмите «Я передумал» в уведомлении или «Отменить удаление» в настройках.")
                 .setPositiveButton("Удалить", (dialog, which) -> startDeletionProcess())
                 .setNegativeButton("Отмена", null)
                 .show();
@@ -253,7 +232,7 @@ public class SettingsFragment extends Fragment {
                 getActivity(), 0, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), "PETMON_CHANNEL")
-                .setSmallIcon(android.R.drawable.ic_dialog_alert) // Строго системная прозрачная иконка
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
                 .setContentTitle("Аккаунт готов к удалению")
                 .setContentText("Процесс запущен. Вы можете отменить его.")
                 .addAction(android.R.drawable.ic_menu_revert, "Я ПЕРЕДУМАЛ", pendingCancelIntent)
@@ -263,57 +242,64 @@ public class SettingsFragment extends Fragment {
         Toast.makeText(getActivity(), "Таймер удаления запущен!", Toast.LENGTH_SHORT).show();
     }
 
-    // --- МЕТОДЫ ТЕМЫ И ПОКРАСКИ ---
+    // --- СТАНДАРТНЫЕ МЕТОДЫ ---
 
-    private void changeTheme(String theme) {
-        if (getActivity() == null) return;
-        getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE).edit().putString("theme_mode", theme).apply();
-        applyCurrentTheme();
+    @Override
+    public void onResume() {
+        super.onResume();
+        checkDeletionStatus();
+        loadOwnerData();
+    }
 
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).applyTheme();
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (getActivity() != null && prefListener != null) {
+            getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
+                    .unregisterOnSharedPreferenceChangeListener(prefListener);
         }
     }
 
-    private void applyCurrentTheme() {
+    private void loadOwnerData() {
         if (getActivity() == null) return;
-        int lightGray = Color.parseColor("#9E9E9E");
-        tvThemeDesc.setTextColor(lightGray);
-        tvAnimDesc.setTextColor(lightGray);
-        etSearch.setTextColor(lightGray);
-        etSearch.setHintTextColor(lightGray);
-        tvSettingsName.setTextColor(lightGray);
+        SharedPreferences prefs = getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE);
+        tvSettingsName.setText(prefs.getString("user_name", "Владелец"));
+        tvSettingsAvatar.setText(prefs.getString("user_avatar_emoji", "🐶"));
+    }
 
-        String theme = getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE).getString("theme_mode", "day");
+    private void applyTheme() {
+        if (getActivity() == null) return;
+        SharedPreferences prefs = getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE);
+        String theme = prefs.getString("theme_mode", "day");
 
         if (theme.equals("night")) {
-            cardTheme.setCardBackgroundColor(Color.parseColor("#1E1E1E"));
-            cardAnim.setCardBackgroundColor(Color.parseColor("#1E1E1E"));
-            etSearch.setBackgroundColor(Color.parseColor("#1E1E1E"));
+            settingsRootLayout.setBackgroundColor(Color.parseColor("#121212"));
+            tvSettingsTitle.setTextColor(Color.parseColor("#E0E0E0"));
+            tvSettingsName.setTextColor(Color.WHITE);
+            btnSearchSettings.setColorFilter(Color.parseColor("#E0E0E0"));
+
+            cardGeneralSettings.setCardBackgroundColor(Color.parseColor("#1E1E1E"));
+            cardAppSettings.setCardBackgroundColor(Color.parseColor("#1E1E1E"));
             cardDangerZone.setCardBackgroundColor(Color.parseColor("#1E1E1E"));
 
-            btnLogout.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#2C1E1E")));
-            btnLogout.setTextColor(Color.parseColor("#EF5350"));
-
-            btnDeleteAccount.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#2C1E1E")));
-            btnDeleteAccount.setTextColor(Color.parseColor("#EF5350"));
-
-            btnCancelDeletion.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#1B3320")));
-            btnCancelDeletion.setTextColor(Color.parseColor("#4CAF50"));
+            menuPetInfo.setTextColor(Color.WHITE);
+            menuAppearance.setTextColor(Color.WHITE);
+            menuNotifications.setTextColor(Color.WHITE);
+            menuLogout.setTextColor(Color.WHITE);
         } else {
-            cardTheme.setCardBackgroundColor(Color.WHITE);
-            cardAnim.setCardBackgroundColor(Color.WHITE);
-            etSearch.setBackgroundColor(Color.parseColor("#E0E0E0"));
+            settingsRootLayout.setBackgroundColor(Color.parseColor("#F4F7F6"));
+            tvSettingsTitle.setTextColor(Color.parseColor("#2D3436"));
+            tvSettingsName.setTextColor(Color.parseColor("#9E9E9E"));
+            btnSearchSettings.setColorFilter(Color.parseColor("#9E9E9E"));
+
+            cardGeneralSettings.setCardBackgroundColor(Color.WHITE);
+            cardAppSettings.setCardBackgroundColor(Color.WHITE);
             cardDangerZone.setCardBackgroundColor(Color.WHITE);
 
-            btnLogout.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFEBEE")));
-            btnLogout.setTextColor(Color.parseColor("#D32F2F"));
-
-            btnDeleteAccount.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFEBEE")));
-            btnDeleteAccount.setTextColor(Color.parseColor("#D32F2F"));
-
-            btnCancelDeletion.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#E8F5E9")));
-            btnCancelDeletion.setTextColor(Color.parseColor("#2E7D32"));
+            menuPetInfo.setTextColor(Color.parseColor("#2D3436"));
+            menuAppearance.setTextColor(Color.parseColor("#2D3436"));
+            menuNotifications.setTextColor(Color.parseColor("#2D3436"));
+            menuLogout.setTextColor(Color.parseColor("#D32F2F"));
         }
     }
 }
