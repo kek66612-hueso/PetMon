@@ -7,6 +7,9 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 public class CurvedTextView extends View {
     private Paint paint;

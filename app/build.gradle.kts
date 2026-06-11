@@ -13,6 +13,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -31,12 +32,20 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.firebase:firebase-auth:22.3.1")
 
     // Glide для загрузки аватарок
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    // Firebase (уведомления)
-    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
-    implementation("com.google.firebase:firebase-messaging")
+    // --- ЕДИНЫЙ БЛОК FIREBASE ---
+    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-firestore:24.7.1")
+
+    //kotlin
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+
+    // Gson
+    implementation("com.google.code.gson:gson:2.10.1")
 }

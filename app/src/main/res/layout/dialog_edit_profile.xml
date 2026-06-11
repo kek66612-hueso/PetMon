@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="0dp"
+    android:layout_margin="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal"
+        android:background="#FFFFFF">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Редактировать профиль"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="24dp"/>
+
+        <RelativeLayout
+            android:id="@+id/avatarContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackgroundBorderless">
+
+            <TextView
+                android:id="@+id/tvDialogAvatar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@drawable/bg_circle"
+                android:gravity="center"
+                android:text="🐶"
+                android:textSize="50sp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignBottom="@id/tvDialogAvatar"
+                android:layout_alignEnd="@id/tvDialogAvatar"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="#2D3436"
+                app:cardElevation="4dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="✏️"
+                    android:textSize="14sp"/>
+            </androidx.cardview.widget.CardView>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Нажми на аватар для изменения"
+            android:textSize="12sp"
+            android:textColor="#9E9E9E"
+            android:layout_marginBottom="24dp"/>
+
+        <EditText
+            android:id="@+id/etDialogName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#F4F7F6"
+            android:hint="Ваше имя"
+            android:paddingHorizontal="16dp"
+            android:textColor="#333333"
+            android:textColorHint="#9E9E9E"
+            android:singleLine="true"
+            android:maxLength="15"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btnDialogSave"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Сохранить"
+            android:backgroundTint="#2D3436"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="12dp"/>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
