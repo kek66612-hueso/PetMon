@@ -86,6 +86,7 @@ public class SettingsFragment extends Fragment {
             SharedPreferences prefs = getActivity().getSharedPreferences("AppConfig", Context.MODE_PRIVATE);
             prefListener = (sharedPreferences, key) -> {
                 if ("account_delete_time".equals(key)) {
+
                     checkDeletionStatus();
                 }
             };

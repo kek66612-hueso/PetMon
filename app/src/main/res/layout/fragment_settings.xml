@@ -51,7 +51,6 @@
                 android:orientation="vertical"
                 android:gravity="center"
                 android:layout_marginBottom="32dp">
-
                 <TextView
                     android:id="@+id/tvSettingsAvatar"
                     android:layout_width="100dp"
@@ -212,7 +211,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -42,7 +43,11 @@ public class RegistrationActivity extends AppCompatActivity {
             prefs.edit().putString("theme_mode", defaultTheme).apply();
         }
 
+
         setContentView(R.layout.activity_registration);
+        applyTheme();
+
+        // --- 3. ПОТОМ КРАСИМ ЕЁ В НУЖНУЮ ТЕМУ ---
         applyTheme();
 
         tvSelectedEmoji = findViewById(R.id.tvSelectedEmoji);
@@ -233,4 +238,6 @@ public class RegistrationActivity extends AppCompatActivity {
             if (btnStart != null) btnStart.setTextColor(Color.WHITE);
         }
     }
+
+
 }

@@ -39,6 +39,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+
         rootLayout = view.findViewById(R.id.profile_root);
         tvProfileTitle = view.findViewById(R.id.tvProfileTitle);
         tvProfileAvatar = view.findViewById(R.id.tvProfileAvatar);
@@ -46,6 +47,7 @@ public class ProfileFragment extends Fragment {
 
         Button btnEditProfile = view.findViewById(R.id.btnEditProfile);
         Button btnGoToSettings = view.findViewById(R.id.btnGoToSettings);
+
 
         // КНОПКА 1: Открываем красивое окно редактирования
         btnEditProfile.setOnClickListener(v -> showEditDialog());
@@ -58,7 +60,6 @@ public class ProfileFragment extends Fragment {
                 if (bottomNav != null) {
                     bottomNav.setSelectedItemId(R.id.nav_settings);
                 }
-
                 // ЗАПРОС РАЗРЕШЕНИЯ НА УВЕДОМЛЕНИЯ (ДЛЯ ANDROID 13+)
                 if (Build.VERSION.SDK_INT >= 33) {
                     if (ContextCompat.checkSelfPermission(requireContext(), "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
@@ -74,6 +75,7 @@ public class ProfileFragment extends Fragment {
 
         return view;
     }
+
 
     @Override
     public void onResume() {
@@ -133,7 +135,6 @@ public class ProfileFragment extends Fragment {
         // --- МАГИЯ FIREBASE ВНУТРИ ТВОЕЙ КНОПКИ ---
         btnDialogSave.setOnClickListener(v -> {
             String newName = etDialogName.getText() != null ? etDialogName.getText().toString().trim() : "";
-
             if (newName.length() < 2) {
                 Toast.makeText(getActivity(), "Имя должно содержать хотя бы 2 символа", Toast.LENGTH_SHORT).show();
                 return;

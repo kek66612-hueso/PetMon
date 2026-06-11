@@ -41,7 +41,6 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-
         rootLayout = view;
 
         rvPets = view.findViewById(R.id.rvPets);
@@ -204,4 +203,5 @@ public class HomeFragment extends Fragment {
         super.onResume();
         updateUI();
     }
+
 }
